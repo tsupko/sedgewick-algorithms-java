@@ -1,0 +1,56 @@
+9.9   Convex Hull
+
+
+This chapter under construction.
+Convex hull. Given set of N points in the Euclidean plane, find minimum area convex region that contains every point.
+Intuition: points are nails perpendicular to plane, stretch an elastic rubber bound around all points; it will minimize length.
+Definitions.
+A set of points S is convex if for any two points in S, the line segment joining them is also inside the set.
+A point p is an extreme point of a convex set S if p is not interior to any line segment connecting two points in the set.
+Applications. Among oldest and most well-studied problems in computational geometry problems.
+Robot motion planning.
+Shortest perimeter fence enclosing P.
+Smallest area polygon enclosing P.
+Unique convex polygon whose vertices are points in P that encloses P.
+Smallest convex set containing all N points (i.e., intersection of all convex sets containing the N points).
+Representation. How to represent the convex hull? (i) list all extreme points of hull, (ii) list all extreme points of hull in counterclockwise order, (iii) list all points on boundary of hull, (iv) lost all points on boundary of hull in counterclockwise order. Output (ii) is most useful.
+Useful facts about convex hull.
+Point p0 with smallest y-coordinate (breaking ties by x-coordinate) is extreme point.
+The extreme points of the convex hull appear in the same order as the polar sort with respect to p0.
+Can traverse the convex hull by making only ccw turns.
+ccw subroutine.
+Is a point inside a triangle? Use 1 ccw to determine orientation of triangle and 3 ccw to determine inside.
+Is a point inside a convex quadritateral? Use 1 ccw to determine orientation and 4 ccw to determine inside.
+Polar sort.
+Graham scan. Cited by Preparata and Shamos as the first "computational geometry algorithm." GrahamScan.java implements the Graham scan algorithm using the helper data type Point2D.java. GrahamScanNondegenerate.java assumes the points are in general position (no coincident points, no 3 collinear). The data files input19.txt and rs1423.txt are two sample data files. The first input includes a number of degeneracies (O' Rourke p. 85).
+Quick elimination. [S. Akl and G. T. Toussaint, 1978] Heuristic to improve performance of most convex hull algorithms. Given any 4 points, form a convex quadrilateral connecting the points. Any other point that is interior cannot appear on the convex hull, so it is safe to remove from future consideration. Can do this in linear time. (To check whether a point is inside a convex quadrilateral, perform 4 ccw tests.) Choose 4 points as follows: point with lowest x-coordinate, point with highest x-coordinate, point with lowest y-coordinate, and point with highest y-coordinate.
+Or do with convex octagon by also including the 4 points whose sum (difference) of x and y coordinates is as small (large) as possible.
+Convex hull lower bound. We can reduce sorting to convex hull as follows: given N points x1, ..., xN to sort, form points in the plane (xi, xi^2) in the plane. All points are on the hull and the counterclockwise ordering of points is precisely the values in ascending order. So we might expect that the Omega(N log N) bound applies. Careful! Elementary operations are not pairwise comparisons as for sorting. In fact, it's impossible to compute the convex hull using only pairwise comparisons of coordinates! So this lower bound applies, but it is meaningless because the problem cannot be solved at all in the comparison based model of computation. However, a stronger sorting lower bound (in quadratic or algebraic decision tree model) applies.
+Instead, the basic operation is ccw. Instead, we consider a more general model of computation known as quadratic decision trees. In this model, we can compute any quadratic polynomial of the point coordinates xi and yi, and test the sign of the result to see whether its zero, negative, or positive. Comparisons can be computed using algebraic functions of degree 1 (linear). Dot products, cross product, and ccw calculations can be computed using algebraic functions of degree 2 (quadratic). All (?) convex hull algorithm can be formulated in this manner. Yao (1981) proved that Omega(N log N) lower bound applies in this model, even if we only want vertices on hull (and don't insist on the algorithm returning them in counterclockwise order). Ben-Or generalized to algebraic decision tree.
+Output sensitive running time. O(N log N) is optimal, but we can model running time in terms of a parameter that depends on the output. Let h = # extreme points on convex hull. Best convex hull algorithm takes O(N log h) time. In principle, h can be as big as N.
+Quickhull. A demo from Algorithmics Animation Workshop by Hang Thi Anh Pham. 
+
+Exercises
+
+Convex hull visualization. Write a program InteractiveConvexHull.java which accepts mouse clicks in a window and draws the convex hull of the points clicked.
+Farthest 2d pair. Given N points in the plane, write a program FarthestPair.java that finds a pair of points that is farthest apart in Euclidean distance. Your program should run in N log N time in the worst case. This distance is the diameter of the set of points. Hint: the farthest pair are extreme points of the convex hull. Use a version of binary search to find the farthest pair from each extreme point. Alternate hint: rotating callipers.
+Farthest 2d pair. Write a program InteractiveFarthestPair.java that accept mouse clicks in a windows and displays the farthest pair of point.
+General position. Given N points in the plane, design an algorithm to determine if they are in general position (no coincidence points, no 3 collinear points) in N^2 log N time.
+General position. Design an algorithm that generates N points in the plane in general position.
+Convex hull verification. Given N points in the plane and a sequence of h of those points, determine if the h points are the extreme points on the concex hull in counterclockwise order. First check that all turns are strictly ccw; then...
+Convex polygon containment. Let A and B be two convex polygons, represented by their their vertices. Give an linearithmic time algorithm to determine whether A lies completely inside B. Assume no degeneracies - A and B do not share any endpoints and there are no 3 collinear points.
+Solution. Check if the convex hull of the vertices of A equals the convex hull of the vertices of A and B.
+Separating halfplane. Given two sets of points in the plane A and B, determine if there is a halfplane that contains all of the points in A but none of the points in B.
+Solution: compute convex hull of A and B and determine whether they intersect.
+Convex hull of random points in the square. Generate N random points in the unit square. Run some computational experiments to determine that average number of points of their convex hull. Compare it against the theoretical value of (8/3)(γ + ln N), where γ is the Euler-Mascheroni constant ~ 0.5772.
+Find an interior point. Given a set of N points, find a point (not necessarily one of the inputs) that is inside the convex hull of the N points. Your algorithm should run in O(N) time. Hint: take 3 points a, b, and c. If the three are not collinear then return the centroid of the 3 points. Otherwise delete the point in the middle using between and repeat with the remaining N-1 points.
+Convex hull point elimination. Prove that a point p in S is not a vertex of the convex hull if and only if p is contained in the interior of a triangle formed by three other points of S or if p is contained in the interior of a line segment formed by two other points of S.
+Convex hull point characterization. Prove that a point p in S is a vertex of the convex hull if and only if there is a line going through p such taht all the other points in S are on the same side of the line.
+Convex hull of simple polygon. Can do in linear time by applying Graham scan (without presorting). Simple = non-crossing. That is, the crucial part of the first phase of Graham scan is that the result is a simple polygon, whether or not it is sorted by polar angle.
+3D convex hull. First O(N log N) time algorithm discovered by Preparata and Hong.
+Andrew's monotone chain algorithm. Slightly more efficient version of Graham scan. Reference. Sort points by x-coordinate, and then by y-coordinate. Find smallest x and largest x; split into two pieces by y-coordinate. Form upper a lower portions of simple polygon by examining points in ascending order of x-coordinate, then descending order of x-coordinate. Now we have a simple polygon and can find convex hull in linear time by previous exercise. (Avoids sorting by angle.)
+incremental algorithm. Suppose we have the convex hull of a set of N points. Let p be another point. Describe how to form the convex hull of the N+1 points in at most O(N) extra steps. In at most O(log N) using two binary search trees. This is known as the incremental algorithm. The convex hull problem in three dimensions is an important generalization. Graham's algorithm relies crucially on sorting by polar angle. There is no obvious counterpart in three dimensions. Randomized incremental algorithm (Clarkson-Shor) provides practical O(N log N) expected time algorithm in three dimensions.
+Add a point to the convex hull. Suppose that you run Graham's algorithm to compute the convex hull of a set of points S. Now, you want to add one point to S and compute the new convex hull. Describe how to do this in linear time.
+Smallest enclosing circle (the bomb problem). Given N points in the plane, find the smallest circle that contains all N points. (Applications: where to put a hospital, how to score the accuracy of rifle shooting, where to drop a bomb.) Try to discover an N^4 algorithm. Surprisingly, a linear-time algorithm is known.
+Antipodal points. Given N points on a circle, centered at the origin, design an algorithm that determines whether there are two points that are antipodal, i.e., the line connecting the two points goes through the origin. Your algorithm should run in time proportional to N log N.
+Antipodal points. Repeat the previous question, but assume the points are given in clockwise order. Your algorithm should run in time proportional to N.
