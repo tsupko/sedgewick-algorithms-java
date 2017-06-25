@@ -1,4 +1,4 @@
-package ch2.sec5.exercises;
+package ch2.sec5.exercises.convexhull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
