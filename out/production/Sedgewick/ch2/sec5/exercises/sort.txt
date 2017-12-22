@@ -1,8 +1,4 @@
-Exception in thread "main" 25.708402
-java.lang.AssertionError
-	at ch2.sec5.exercises.Sort.main(Sort.java:48)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:498)
-	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:147)
+20.488268 s
+1.548333%
+20.869611 s
+1.546178%

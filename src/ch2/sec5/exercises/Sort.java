@@ -7,14 +7,16 @@ import java.util.*;
  *         Copyright (c) 2016. All rights reserved.
  */
 public class Sort {
-    private static final int SIZE = 1 << 27;//1 << 18;
-    private static final int TRIAL = 1 << 3;
+    private static final int SIZE = 1 << 27; // 1 << 18; for slow sorts, 1 << 27; for fast sorts
+    private static final int BOUND = 1 << 30; // argument to random.nextInt(BOUND);
+    private static final int TRIAL = 1 << 1; // how many times run the experiment
     private static final int SHELL = 20; // for 1 << 27, optimal is 17, which is 48%
-    private static final int CUTOFF = 19;
+    private static final int CUTOFF = 18; // where to switch to insertion sort (optimal is about 18)
 
-    private static int[] a = new int[SIZE];
-    private static Random random = new Random();
-    private static int[] shell = new int[SHELL];
+    private static int[] a = new int[SIZE]; // array to be sorted
+    private static int[] shell = new int[SHELL]; // array containing k-numbers for the Shell sort
+    private static long start, finish; // start and finish moments of time
+    private static Random random = new Random(); // pseudo-random number generator
 
     static {
         shell[0]++;
@@ -32,20 +34,16 @@ public class Sort {
 
     public static void main(String[] args) {
         for (int i = 0; i < TRIAL; i++) {
-            shuffle(a);
-            long start = System.nanoTime();
-//            bubbleSort(a);
-//            selectionSort(a);
-//            insertionSort(a);
-//            shellSort(a);
-//            mergeSort(a);
-//            quickSort(a);
-            threeWayQuickSort(a);
-//            heapSort(a);
-//            radixSort(a);
-//            Arrays.sort(a);
-            System.out.printf(Locale.US, "%f%n", (System.nanoTime() - start) / 1E9);
+            generateArray(a);
+            if (!isSorted(a)) {
+                start = System.nanoTime();
+//                quickSort(a);
+                Arrays.sort(a);
+                finish = System.nanoTime();
+            }
+            System.out.printf(Locale.US, "%f%s%n", (finish - start) * 1e-9, " s");
             assert isSorted(a);
+            countDuplicates(a);
         }
     }
 
@@ -77,23 +75,36 @@ public class Sort {
     }
 
     private static void quickSort(int[] a, int lo, int hi) {
-        if (hi <= lo + CUTOFF - 1) {
+        if (hi <= lo + CUTOFF) {
             insertionSort(a, lo, hi);
             return;
         }
-//        int median = medianOf3(a, lo, lo + (hi - lo >> 1), hi);
-//        if (median != lo) swap(a, lo, median);
-        int j = partition(a, lo, hi);
-        quickSort(a, lo, j-1);
-        quickSort(a, j+1, hi);
+        int median = medianOf3(a, lo, lo + hi >> 1, hi);
+        if (median != lo) swap(a, lo, median);
+        int pivot = partition(a, lo, hi);
+        quickSort(a, lo, pivot - 1);
+        quickSort(a, pivot + 1, hi);
     }
 
     private static int medianOf3(int[] a, int lo, int mid, int hi) {
-        int min = Math.min(Math.min(a[lo], a[mid]), a[hi]);
-        int max = Math.max(Math.max(a[lo], a[mid]), a[hi]);
-        if (a[lo] == min && a[hi] == max || a[lo] == max && a[hi] == min) return mid;
-        if (a[lo] == min && a[mid] == max || a[lo] == max && a[mid] == min) return hi;
-        return lo;
+        if (a[lo] < a[mid]) {
+            if (a[mid] < a[hi]) {
+                return mid;
+            } else if (a[lo] < a[hi]) { // a[hi] < a[mid]
+                return hi;
+            } else {
+                return lo;
+            }
+        } else { // a[mid] < a[lo]
+            if (a[lo] < a[hi]) {
+                return lo;
+            } else if (a[mid] < a[hi]) { // a[hi] < a[lo]
+                return hi;
+            } else {
+                return mid;
+            }
+        }
+//        return a[lo] < a[mid] ? (a[mid] < a[hi] ? lo : hi) : (a[lo] < a[hi] ? lo : hi);
     }
 
     private static void insertionSort(int[] a, int lo, int hi) {
@@ -160,7 +171,7 @@ public class Sort {
     }
 
     private static void insertionSort(int[] a) {
-        for (int i = 0; i < a.length; i++) {
+        for (int i = 1; i < a.length; i++) {
             for (int j = i; j > 0 && a[j] < a[j-1]; j--) {
                 swap(a, j, j-1);
             }
@@ -188,7 +199,7 @@ public class Sort {
         }
     }
 
-    private static void shuffle(int[] a) {
+    private static void generateArray(int[] a) {
         for (int i = 0; i < SIZE; i++) {
             a[i] = random.nextInt();
         }
@@ -201,14 +212,21 @@ public class Sort {
     }
 
     private static boolean isSorted(int[] a) {
-//        int count = 0;
         for (int i = 1; i < a.length; i++) {
             if (a[i] < a[i-1]) {
                 return false;
-//                if (a[i] == a[i-1]) count++; else return false;
             }
         }
-//        System.err.println(String.format(Locale.US, "%f%s", (float) count / SIZE * 100, '%'));
         return true;
+    }
+
+    private static void countDuplicates(int[] a) {
+        int count = 0;
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] == a[i-1]) {
+                count++;
+            }
+        }
+        System.err.printf(Locale.US, "%f%s%n", (float) count / SIZE * 100, '%');
     }
 }
